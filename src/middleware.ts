@@ -14,49 +14,53 @@ export async function middleware(request: NextRequest) {
 
   const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
 
+
+  // 增加部分，直接放行，后面的验证密码逻辑就不执行了
+  return NextResponse.next();
+
 // if (!process.env.PASSWORD) {
 //   // 如果没有设置密码，重定向到警告页面
 //   const warningUrl = new URL('/warning', request.url);
 //   return NextResponse.redirect(warningUrl);
 // }
 
-  // 从cookie获取认证信息
-  const authInfo = getAuthInfoFromCookie(request);
+//  // 从cookie获取认证信息
+//  const authInfo = getAuthInfoFromCookie(request);
 
-  if (!authInfo) {
-    return handleAuthFailure(request, pathname);
-  }
+//  if (!authInfo) {
+//    return handleAuthFailure(request, pathname);
+//  }
 
-  // localstorage模式：在middleware中完成验证
-  if (storageType === 'localstorage') {
-    if (!authInfo.password || authInfo.password !== process.env.PASSWORD) {
-      return handleAuthFailure(request, pathname);
-    }
-    return NextResponse.next();
-  }
+//  // localstorage模式：在middleware中完成验证
+//  if (storageType === 'localstorage') {
+//    if (!authInfo.password || authInfo.password !== process.env.PASSWORD) {
+//      return handleAuthFailure(request, pathname);
+//    }
+//    return NextResponse.next();
+//  }
 
   // 其他模式：只验证签名
   // 检查是否有用户名（非localStorage模式下密码不存储在cookie中）
-  if (!authInfo.username || !authInfo.signature) {
-    return handleAuthFailure(request, pathname);
-  }
+//  if (!authInfo.username || !authInfo.signature) {
+//    return handleAuthFailure(request, pathname);
+//  }
 
-  // 验证签名（如果存在）
-  if (authInfo.signature) {
-    const isValidSignature = await verifySignature(
-      authInfo.username,
-      authInfo.signature,
-      process.env.PASSWORD || ''
-    );
+//  // 验证签名（如果存在）
+//  if (authInfo.signature) {
+//    const isValidSignature = await verifySignature(
+//      authInfo.username,
+//      authInfo.signature,
+//      process.env.PASSWORD || ''
+//    );
 
-    // 签名验证通过即可
-    if (isValidSignature) {
-      return NextResponse.next();
-    }
-  }
+//    // 签名验证通过即可
+//    if (isValidSignature) {
+//      return NextResponse.next();
+//    }
+//  }
 
-  // 签名验证失败或不存在签名
-  return handleAuthFailure(request, pathname);
+//  // 签名验证失败或不存在签名
+//  return handleAuthFailure(request, pathname);
 }
 
 // 验证签名
@@ -130,9 +134,16 @@ function shouldSkipAuth(pathname: string): boolean {
   return skipPaths.some((path) => pathname.startsWith(path));
 }
 
+// 这部分注释掉 //
 // 配置middleware匹配规则
-export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|login|warning|api/login|api/register|api/logout|api/cron|api/server-config).*)',
-  ],
+//export const config = {
+//  matcher: [
+//    '/((?!_next/static|_next/image|favicon.ico|login|warning|api/login|api/register|api/logout|api/cron|api/server-config).*)',
+//  ],
+//};
+
+// 注释掉的部分替换掉下面这样的 //
+// 配置middleware匹配规则
+export const config = { 
+  matcher: [] 
 };
